@@ -1,6 +1,7 @@
 # Data Integration Manager
 
 A Next.js application for managing data integration connections between BigQuery and marketing platforms (Meta Marketing and Google Ads).
+This is it.
 
 ## Features
 
