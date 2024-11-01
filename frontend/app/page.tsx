@@ -7,7 +7,7 @@ import { Connection } from './types';
 export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [baseUrl, setBaseUrl] = useState('');
+  const [ipAddress, setIpAddress] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
 
@@ -16,7 +16,7 @@ export default function Home() {
       // Update existing connection
       setConnections(connections.map(c => 
         c.id === editingConnection.id 
-          ? { ...connection, baseUrl, apiKey, id: editingConnection.id }
+          ? { ...connection, baseUrl: `http://${ipAddress}`, apiKey, id: editingConnection.id }
           : c
       ));
       setEditingConnection(null);
@@ -24,7 +24,7 @@ export default function Home() {
       // Add new connection
       const newConnection = {
         ...connection,
-        baseUrl,
+        baseUrl: `http://${ipAddress}`,
         apiKey
       };
       setConnections([...connections, newConnection]);
@@ -33,18 +33,23 @@ export default function Home() {
   };
 
   const handleHealthCheck = async () => {
-    if (!baseUrl || !apiKey) {
-      alert('Please provide both Base URL and API Key');
+    if (!ipAddress || !apiKey) {
+      alert('Please provide both IP Address and API Key');
       return;
     }
 
     try {
-      const response = await fetch(`${baseUrl}/connect`, {
-        method: 'GET',
+      const response = await fetch(`http://${ipAddress}/api/v1/connect`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': apiKey
-        }
+          'X-API-Key': apiKey,
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, X-API-Key'
+        },
+        mode: 'cors',
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -57,6 +62,17 @@ export default function Home() {
     }
   };
 
+  // Helper function to validate IP address
+  const isValidIP = (ip: string) => {
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip)) return false;
+    const parts = ip.split('.');
+    return parts.every(part => {
+      const num = parseInt(part, 10);
+      return num >= 0 && num <= 255;
+    });
+  };
+
   return (
     <main className="container mx-auto p-4 max-w-6xl">
       <div className="mb-6">
@@ -64,11 +80,16 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-gray-900">Data Integration Dashboard</h1>
           <div className="flex-1 flex items-center gap-4">
             <input
-              type="url"
-              value={baseUrl}
-              onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder="Backend Base URL"
-              className="px-3 py-2 border rounded-md text-sm"
+              type="text"
+              value={ipAddress}
+              onChange={(e) => {
+                const value = e.target.value;
+                setIpAddress(value);
+              }}
+              placeholder="IP Address (e.g., 192.168.1.1)"
+              className={`px-3 py-2 border rounded-md text-sm ${
+                ipAddress && !isValidIP(ipAddress) ? 'border-red-500' : ''
+              }`}
             />
             <input
               type="password"
