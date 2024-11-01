@@ -9,11 +9,18 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="passlib.handlers.bcrypt")
+from urllib.parse import unquote_plus
 
 load_dotenv()
 
 # Initialize FastAPI app
-app = FastAPI()
+app = FastAPI(
+    title="1pdscheduler-pads",
+    description="Scheduling system for pads",
+    version="1.0.0"
+)
 
 # Add CORS middleware
 app.add_middleware(
@@ -133,31 +140,32 @@ async def list_users(current_user: models.User = Depends(get_current_user), db: 
         raise HTTPException(status_code=403, detail="Not authorized to view users")
     return db.query(models.User).all()
 
-@app.delete("/users/{user_id}")
+@app.delete("/users/{user_email}")
 async def delete_user(
-    user_id: int,
+    user_email: str,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(database.get_db)
 ):
     try:
+        # Decode the URL-encoded email
+        decoded_email = unquote_plus(user_email)
+        
         # Check if user has permission to delete
         if not current_user.is_admin:
             raise HTTPException(status_code=403, detail="Not authorized to delete users")
         
         # Prevent deletion of current user
-        if current_user.id == user_id:
+        if current_user.email == decoded_email:
             raise HTTPException(status_code=400, detail="Cannot delete your own account")
             
         # Verify user exists first
-        user = db.query(models.User).filter(models.User.id == user_id).first()
+        user = db.query(models.User).filter(models.User.email == decoded_email).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
             
         db.delete(user)
         db.commit()
         return {"message": "User deleted successfully"}
-    except ValueError:
-        raise HTTPException(status_code=422, detail="Invalid user ID format")
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))

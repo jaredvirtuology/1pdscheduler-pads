@@ -5,9 +5,8 @@ import UserManagement from './components/UserManagement';
 type View = 'login' | 'dashboard' | 'users';
 
 interface User {
-  id: number;
-  username: string;
   email: string;
+  username: string;
   is_active: boolean;
   is_admin: boolean;
 }
@@ -73,7 +72,7 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex items-center space-x-4">
-                <h1 className="text-xl font-semibold">Dashboard</h1>
+                <h1 className="text-xl font-semibold">1pdscheduler-pads</h1>
                 <button
                   onClick={() => setView('dashboard')}
                   className={`px-3 py-2 rounded-md ${view === 'dashboard' ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
@@ -166,8 +165,11 @@ export default function App() {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            1pdscheduler-pads
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Sign in to your account
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
