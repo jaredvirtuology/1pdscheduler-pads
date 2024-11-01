@@ -1,6 +1,14 @@
 'use client';
 import { useState } from 'react';
 import UserManagement from './components/UserManagement';
+import SchemaViewer from './components/SchemaViewer';
+import dynamic from 'next/dynamic';
+
+// Use dynamic import with ssr disabled for SchemaViewer
+const DynamicSchemaViewer = dynamic(
+  () => import('./components/SchemaViewer'),
+  { ssr: false }
+);
 
 type View = 'login' | 'dashboard' | 'users';
 
@@ -198,6 +206,10 @@ export default function App() {
               currentUser={currentUser as User | undefined}
             />
           )}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4">Schema Viewer</h2>
+            <DynamicSchemaViewer />
+          </div>
         </main>
       </div>
     );

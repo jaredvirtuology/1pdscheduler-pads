@@ -13,11 +13,17 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="passlib.handlers.bcrypt")
 from urllib.parse import unquote_plus
 import requests
+import httpx
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
 # Use environment variables for configuration
 TIGHTLOCK_IP = os.getenv('TIGHTLOCK_IP', '{ADDRESS}')
+BASE_URL = f"http://{TIGHTLOCK_IP}/api/v1"
 API_KEY = os.getenv('TIGHTLOCK_API_KEY', '{EXAMPLE_API_KEY}')
 
 # Initialize FastAPI app
@@ -195,8 +201,6 @@ async def change_password(
 # Add this new endpoint to your existing FastAPI app
 @app.get("/healthcheck")
 async def healthcheck():
-    BASE_URL = f"http://{TIGHTLOCK_IP}/api/v1"
-
     headers = {
     "Content-Type": "application/json",
     "X-API-Key": API_KEY
@@ -205,3 +209,19 @@ async def healthcheck():
     url = f"{BASE_URL}/connect"
     response = requests.post(url, headers=headers)
     return response.text, response.status_code
+
+@app.get("/schemas")
+async def get_schemas():
+    try:
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": API_KEY
+        }
+        
+        url = f"{BASE_URL}/schemas"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        logger.error(f"Error fetching schemas from TightLock: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch schemas from TightLock")
