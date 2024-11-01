@@ -177,7 +177,6 @@ export default function UserManagement({ token, isAdmin, currentUser }: Props) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold mb-4">1pdscheduler-pads</h1>
       {message && (
         <div className="bg-green-50 p-4 rounded-md">
           <p className="text-green-800">{message}</p>
