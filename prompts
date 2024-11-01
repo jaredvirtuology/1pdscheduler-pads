@@ -1,0 +1,99 @@
+# Full-Stack User Management System
+
+Create a full-stack application for user management with admin capabilities using FastAPI for the backend and Next.js for the frontend.
+
+## Core Features
+1. User Authentication
+   - Login system with JWT tokens
+   - Role-based access (Admin/Regular users)
+   - Secure password handling
+
+2. User Management (Admin Only)
+   - View all users in a table format
+   - Create new users
+   - Delete existing users
+   - Cannot delete own account
+   - Toggle admin privileges for users
+
+3. Security Requirements
+   - Password hashing
+   - JWT token authentication
+   - Protected API endpoints
+   - CORS configuration
+   - Input validation
+
+## Technical Stack
+
+### Backend (FastAPI)
+- Database: SQLite with SQLAlchemy ORM
+- Authentication: JWT tokens
+- Password hashing: bcrypt
+- Environment variables for configuration
+- Pydantic models for validation
+
+### Frontend (Next.js)
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Client-side form validation
+- Protected routes
+- Responsive design
+
+## API Endpoints
+1. Authentication
+   - POST /token (login)
+   - GET /users/me (current user)
+
+2. User Management
+   - GET /users/ (list all users)
+   - POST /users/ (create user)
+   - DELETE /users/{user_id}/ (delete user)
+
+## Data Models
+
+### User Model
+- id: Integer (Primary Key)
+- username: String (Unique)
+- email: String (Unique)
+- hashed_password: String
+- is_admin: Boolean
+- is_active: Boolean
+
+## UI Requirements
+1. Login Page
+   - Username/password form
+   - Error handling
+   - Redirect to dashboard on success
+
+2. User Management Dashboard
+   - User list table with columns:
+     * Username
+     * Email
+     * Role (Admin/User)
+     * Actions (Delete)
+   - Create user form with fields:
+     * Username
+     * Email
+     * Password
+     * Admin toggle
+   - Success/error messages
+   - Confirmation for delete actions
+   - Loading states for all actions
+
+## Security Considerations
+1. Prevent self-deletion for admin accounts
+2. Proper error handling and messages
+3. Input sanitization
+4. Secure password storage
+5. Protected API routes
+6. Token expiration
+7. CORS configuration
+
+## Additional Requirements
+1. Environment variables for configuration
+2. Error boundary handling
+3. Loading states for async operations
+4. Proper TypeScript types
+5. Clean code structure
+6. Responsive design
+7. User-friendly error messages
+8. Initial admin user seeding
